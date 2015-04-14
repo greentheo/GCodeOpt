@@ -1,0 +1,17 @@
+{
+    "contents" : "#### picture to G-code\nlibrary(dplyr)\nlibrary(TSP)\nlibrary(ggplot2)\nlibrary(GCodeROpt)\nlibrary(readbitmap)\nlibrary(EBImage)\nlibrary(DEoptim)\n\nfile = '~/BTSync/TheoPersonal/Photos/maliaAndAriCropped.jpg'\n\nxrsz = .5\nyrsz = xrsz\n\nxmax = 11\nymax = 11\n\npcnt = .1\nthreshold = 50/100\nimg=readImage(file)\npic = imageData(flip(resize(img,w = xrsz*ncol(img), h = yrsz*nrow(img))))\n\npicBW = .21*pic[,,1]+.72*pic[,,2] +.07*pic[,,3]\npicDF = data.frame(y=sort(rep(1:ncol(picBW), nrow(picBW))), \n                   x=rep((1:nrow(picBW)), ncol(picBW)), \n                   bw=as.numeric(picBW))\n\nggplot(subset(picDF, bw<threshold), aes(x=x, y=y, fill=bw))+geom_raster()\n\npicDF = subset(picDF, bw<quantile(bw,threshold))\npicDFSamp = picDF[sample(1:nrow(picDF), .4*nrow(picDF),prob = 1/2/(picDF$bw+.001)),]\n\nggplot(picDFSamp, aes(x=x, y=y, fill=bw))+geom_raster()\n\n\n#break it up into clusters of size 1k or less to keep the tsp problem within a good memory range\n#use DEoptim to find the centers so that each cluster is 1k or so\noptFun = function(centerVec, picDFSamp){\n  centers = data.frame(x=centerVec[1:(length(centerVec)/2)], \n                       y=centerVec[(length(centerVec)/2+1):length(centerVec)])\n  clusts = try(kmeans(x = picDFSamp[,c(\"x\",\"y\")], centers = centers))\n  if(class(clusts)==\"try-error\"){\n    return(length(centerVec))\n  }else{\n    return(sum(table(clusts$cluster)>1000))  \n  }\n  \n}\ncenterLow = rep(0,(ceiling(nrow(picDFSamp)/1000)+1)*2)\ncenterHigh = rep(max(picDFSamp),(ceiling(nrow(picDFSamp)/1000)+1)*2)\nDEoptim(optFun, lower = centerLow, upper = centerHigh,picDFSamp=picDFSamp)\n\npicDFSamp[[\"clust\"]] = clusts$cluster\n\nggplot(picDFSamp, aes(x=x, y=y, fill=factor(clust)))+geom_raster()\n\nfor(i in 1:nrow(clusts$centers)){\n  distOpt = dist(subset(picDFSamp, clust=i)[,c(\"x\",\"y\")])\n    \n  tsp = TSP(distOpt)\n  \n  picDFSampOrd = data.frame(picDFSamp[ as.integer(solve_TSP(tsp,\"nn\")), ], sort=1:nrow(picDFSamp))  \n  ggplot(picDFSampOrd, aes(x=x, y=y))+geom_path()\n}\n\n\n\n\n",
+    "created" : 1427990804539.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3491422181",
+    "id" : "918388DF",
+    "lastKnownWriteTime" : 1428165360,
+    "path" : "~/githubrepo/GCodeROpt/inst/pic2randGCode.R",
+    "project_path" : "inst/pic2randGCode.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

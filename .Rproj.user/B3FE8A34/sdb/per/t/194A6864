@@ -1,0 +1,16 @@
+{
+    "contents" : "Package: GCodeROpt\nTitle: What the Package Does (one line, title case)\nVersion: 0.0.0.9000\nAuthors@R: person(\"First\", \"Last\", , \"first.last@example.com\", role = c(\"aut\", \"cre\"))\nDescription: What the package does (one paragraph)\nDepends: R (>= 3.1.1), zoo, dplyr,TSP, ggplot2\nLicense: What license is it under?\nLazyData: true\n",
+    "created" : 1427331717488.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3515493351",
+    "id" : "194A6864",
+    "lastKnownWriteTime" : 1427331815,
+    "path" : "~/githubrepo/GCodeROpt/DESCRIPTION",
+    "project_path" : "DESCRIPTION",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "dcf"
+}

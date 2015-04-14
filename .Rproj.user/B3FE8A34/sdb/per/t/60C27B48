@@ -1,0 +1,17 @@
+{
+    "contents" : "#' A function to take in gCode and return the distance and time it will take to traverse\n#' @export\ntimeToComplete = function(g0Code, feedRate=120){\n  x = c(0,as.numeric(gsub('*.Z.*', 'NA', \n                                   gsub('[ ][Y][0-9].*$', '', \n                                        gsub('^G[0-9] X','',g0Code)))))\n  x=zoo::na.locf(x)\n  y = c(0,as.numeric(gsub('*.Z.*', 'NA', \n                               gsub('^G[0-9] X.*[ ]Y', '', \n                                    gsub('F.*$', '',g0Code)))))\n  y=zoo::na.locf(y)\n  z = c(0,as.numeric( gsub('^G[0-9] X.*[ ]Y', 'NA',\n                      gsub('^G1 Z', '', \n                           gsub('F.*$', '',g0Code)))))\n  z=zoo::na.locf(z)\n  \n  FeedRate = as.numeric(gsub('^G[029]', 'NA',  \n                                  gsub('^G1.*F', '',g0Code)))\n  FeedRate[is.na(FeedRate)] = feedRate\n  \n  dist = sqrt(\n                (x[2:length(x)]-x[1:(length(x)-1)])^2+\n                (y[2:length(x)]-y[1:(length(x)-1)])^2+\n                (z[2:length(x)]-z[1:(length(x)-1)])^2\n  )\n  time = dist/FeedRate\n  return(data.frame(time=sum(time), dist=sum(dist)))\n}",
+    "created" : 1427324206036.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2736206328",
+    "id" : "60C27B48",
+    "lastKnownWriteTime" : 1427331670,
+    "path" : "~/githubrepo/GCodeROpt/R/funs.R",
+    "project_path" : "R/funs.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
