@@ -26,3 +26,30 @@ timeToComplete = function(g0Code, feedRate=120){
   time = dist/FeedRate
   return(data.frame(time=sum(time), dist=sum(dist)))
 }
+
+#'  A function to take a set of XY coordinates and a "group" parameter
+#'  And turn it into GCode
+#'  @export
+XYtoGCode = function(df, cluster="clust",maxy=1, maxx=1, feedRate=5){
+  #start with a G0 to the first point
+  ymult = maxy/max(df$y)
+  xmult = maxx/max(df$x)
+  
+  gcode = sprintf("G0 X%f Y%f", df$x[1]*xmult, df$y[1]*ymult)
+  for(i in 2:nrow(df)){
+    if(df$clust[i]!=df$clust[i-1]){
+      #then g0 move
+      gcode = rbind(gcode, 
+                    sprintf("G0 X%f Y%f", df$x[i]*xmult, df$y[i]*ymult))
+    }else{
+      #g1 traverse with feedrate
+      
+      gcode = rbind(gcode, 
+                    sprintf("G1 X%f Y%f F%f", df$x[i]*xmult, df$y[i]*ymult, feedRate))
+    }
+  }
+  #go back to the beginnning
+  gcode = rbind(gcode,
+                sprintf("G0 X%f Y%f", 0, 0))
+  return(as.character(gcode))
+}
